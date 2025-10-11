@@ -1,0 +1,54 @@
+{
+  "site": {
+    "slug": "truth-atlas",
+    "title": "Truth Atlas",
+    "description": "A curated encyclopedia of science and civics with rigorous citations.",
+    "tags": ["science", "civics", "education"],
+    "theme": "clarity"
+  },
+  "pages": [
+    {
+      "path": "/",
+      "title": "Welcome to Truth Atlas",
+      "layout": [
+        {
+          "type": "hero",
+          "payload": {
+            "headline": "Navigate a world of verified knowledge",
+            "subheadline": "Every article is vetted by subject matter experts and AI-assisted reviewers.",
+            "image": "assets/earth-grid.jpg",
+            "cta": {
+              "label": "Explore Featured Topics",
+              "href": "/topics"
+            }
+          }
+        },
+        {
+          "type": "featured_articles",
+          "payload": [
+            {
+              "title": "Climate Change Evidence",
+              "summary": "A synthesis of peer-reviewed climate research with interactive data visualizations.",
+              "href": "/articles/climate-change-evidence",
+              "citations": ["DOI:10.1126/science.aaa1987", "IPCC AR6"]
+            },
+            {
+              "title": "Understanding Democratic Institutions",
+              "summary": "Comparative analysis of governance models and safeguards against misinformation.",
+              "href": "/articles/democratic-institutions",
+              "citations": ["OECD Civic Trust Survey 2024", "UN Governance Report"]
+            }
+          ]
+        },
+        {
+          "type": "callout",
+          "payload": {
+            "icon": "shield-check",
+            "title": "How Truth Atlas Works",
+            "body": "Each entry undergoes tri-level review: contributor vetting, AI-assisted fact check, and cross-community validation."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: truthnet-postgres
+    environment:
+      POSTGRES_DB: truthnet
+      POSTGRES_USER: truthnet
+      POSTGRES_PASSWORD: truthnet
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: truthnet-redis
+    ports:
+      - "6379:6379"
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.9
+    container_name: truthnet-search
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: ${TRUTHNET_MEILI_MASTER_KEY:-truthnet-dev-key}
+    ports:
+      - "7700:7700"
+    volumes:
+      - meili-data:/meili_data
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2024-09-22T00-33-43Z
+    container_name: truthnet-minio
+    environment:
+      MINIO_ROOT_USER: truthnet
+      MINIO_ROOT_PASSWORD: truthnet123
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+volumes:
+  postgres-data:
+  meili-data:
+  minio-data:

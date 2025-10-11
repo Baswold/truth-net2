@@ -1,0 +1,72 @@
+{
+  "site": {
+    "slug": "civic-pulse",
+    "title": "Civic Pulse",
+    "description": "Daily digest of verified policy updates and civic actions.",
+    "tags": ["civics", "policy", "news"],
+    "theme": "midnight"
+  },
+  "pages": [
+    {
+      "path": "/",
+      "title": "Today on Civic Pulse",
+      "layout": [
+        {
+          "type": "headline_ticker",
+          "payload": {
+            "items": [
+              {
+                "headline": "Transparency Bill Advances to Committee",
+                "summary": "A bipartisan transparency bill cleared the oversight committee after expert testimony.",
+                "timestamp": "2025-10-10T09:00:00Z"
+              },
+              {
+                "headline": "Civic Funding Dashboard Updated",
+                "summary": "The national civic funding dashboard now displays quarterly grant breakdowns with supporting receipts.",
+                "timestamp": "2025-10-10T07:30:00Z"
+              }
+            ]
+          }
+        },
+        {
+          "type": "timeline",
+          "payload": {
+            "title": "Key Policy Milestones",
+            "entries": [
+              {
+                "date": "2025-10-01",
+                "title": "Campaign Finance Reform Hearing",
+                "details": "Independent auditors present findings on donation traceability reforms.",
+                "citations": ["GAO Report 2025-18"]
+              },
+              {
+                "date": "2025-09-22",
+                "title": "Civic Data Portal Launch",
+                "details": "Open-data initiative releases searchable database of public spending records.",
+                "citations": ["Civic Data Portal Release Notes"]
+              }
+            ]
+          }
+        },
+        {
+          "type": "trusted_sources",
+          "payload": {
+            "title": "Source Transparency",
+            "items": [
+              {
+                "label": "OMNI Fact Review",
+                "href": "https://example.com/omni-fact-review",
+                "notes": "Non-partisan review board providing annotated decisions." 
+              },
+              {
+                "label": "Public Ledger",
+                "href": "https://example.com/public-ledger",
+                "notes": "Immutable ledger of committee votes with links to transcripts."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

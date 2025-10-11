@@ -1,0 +1,66 @@
+{
+  "site": {
+    "slug": "health-clarity",
+    "title": "Health Clarity",
+    "description": "Evidence-based wellness guidance reviewed by licensed practitioners.",
+    "tags": ["health", "wellness", "science"],
+    "theme": "sage"
+  },
+  "pages": [
+    {
+      "path": "/",
+      "title": "Healthy Living Starts with Clarity",
+      "layout": [
+        {
+          "type": "hero",
+          "payload": {
+            "headline": "Trusted guidance for your wellbeing",
+            "subheadline": "Every recommendation references peer-reviewed research and certified professional insights.",
+            "image": "assets/leaf-light.jpg",
+            "cta": {
+              "label": "Browse Latest Insights",
+              "href": "/insights"
+            }
+          }
+        },
+        {
+          "type": "insight_grid",
+          "payload": [
+            {
+              "title": "Understanding Sleep Cycles",
+              "summary": "How circadian rhythms influence rest quality and actionable tips for better sleep.",
+              "href": "/insights/sleep-cycles",
+              "citations": ["Sleep Medicine Reviews 2024", "NIH Sleep Health"]
+            },
+            {
+              "title": "Evidence-Based Nutrition",
+              "summary": "A guide to nutrient-dense diets with transparent sourcing and portion references.",
+              "href": "/insights/evidence-based-nutrition",
+              "citations": ["WHO Nutrition Report", "Journal of Clinical Nutrition"]
+            }
+          ]
+        },
+        {
+          "type": "expert_panel",
+          "payload": {
+            "title": "Meet the Expert Reviewers",
+            "experts": [
+              {
+                "name": "Dr. Amina Patel",
+                "credentials": "MD, Preventive Medicine",
+                "bio": "Focuses on community health interventions with verifiable outcomes.",
+                "photo": "assets/experts/amina-patel.jpg"
+              },
+              {
+                "name": "Leo Nakamura, RD",
+                "credentials": "Registered Dietitian",
+                "bio": "Specializes in nutritional epidemiology and transparent sourcing.",
+                "photo": "assets/experts/leo-nakamura.jpg"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
