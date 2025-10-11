@@ -8,6 +8,8 @@
 
 > **"In a world drowning in misinformation, Truth Net emerges as a beacon of verified knowledge, where every fact is scrutinized, every source is validated, and every voice contributes to collective wisdom."**
 
+**code map from Windsurf:** (https://windsurf.com/codemaps/28fc85fa-c7f5-4186-a47a-9c1f1ab7c504)
+
 ---
 
 ## 📋 Table of Contents
