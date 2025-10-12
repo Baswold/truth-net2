@@ -3,6 +3,7 @@ from .sites import router as sites_router
 from .social import router as social_router
 from .search import router as search_router
 from .moderation import router as moderation_router
+from .fact_check import router as fact_check_router
 
 __all__ = [
     "auth_router",
@@ -10,4 +11,5 @@ __all__ = [
     "social_router",
     "search_router",
     "moderation_router",
+    "fact_check_router",
 ]

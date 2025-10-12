@@ -63,13 +63,13 @@ def search(
         site = db.query(Site).filter(Site.id == page.site_id).first()
         if site:
             results.append(
-                SearchResult(
-                    type="page",
-                    id=page.id,
-                    title=page.title,
-                    snippet=page.metadata.get("description", "")[:200],
-                    url=f"/sites/{site.slug}/pages{page.path}",
+                    SearchResult(
+                        type="page",
+                        id=page.id,
+                        title=page.title,
+                        snippet=page.page_metadata.get("description", "")[:200],
+                        url=f"/sites/{site.slug}/pages{page.path}",
+                    )
                 )
-            )
     
     return results[:limit]

@@ -21,7 +21,7 @@ class Submission(Base, TimestampMixin):
     state: Mapped[str] = mapped_column(String(32), default="pending")  # pending, approved, rejected
     
     priority: Mapped[int] = mapped_column(Integer, default=0)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    submission_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
 
     submitter = relationship("Member")
     reviews = relationship("ReviewAction", back_populates="submission", cascade="all, delete-orphan")
