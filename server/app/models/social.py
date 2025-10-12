@@ -21,7 +21,7 @@ class TruthPost(Base, TimestampMixin):
     
     tags: Mapped[dict] = mapped_column(JSON, default=dict)
     citations: Mapped[dict] = mapped_column(JSON, default=dict)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     
     published: Mapped[bool] = mapped_column(default=False)
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

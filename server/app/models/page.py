@@ -27,7 +27,7 @@ class Page(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(32), default=PageStatus.DRAFT.value)
 
     layout_json: Mapped[dict] = mapped_column(JSON, default=dict)
-    metadata: Mapped[dict] = mapped_column(JSON, default=dict)
+    page_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     
     live_version_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

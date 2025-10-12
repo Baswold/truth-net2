@@ -53,18 +53,22 @@
 - **Dynamic Layouts**: Flexible block-based content system
 - **Version Control**: Full revision history with rollback capabilities
 - **Rich Media Support**: Images, documents, embedded content
+- **Curated Blueprint Catalog**: Three production-ready layout archetypes with automated SEO hints
+- **Instant Previews**: Generate preview JSON for any outline with glossary, FAQ, and collaboration toggles
 
 ### 🤖 **Advanced Fact-Checking**
 - **Dual-AI Verification**: Two independent AI systems cross-validate claims
 - **Web Search Integration**: Real-time evidence gathering from trusted sources
 - **Community Validation**: Human curators provide final oversight
 - **Trust Scoring**: Dynamic scoring based on verification history
+- **Self-Auditing Pipeline**: Auditor layer challenges the primary verdict and escalates disagreements automatically
 
 ### 👥 **Social Features**
 - **Discussion Threads**: Nested conversations around content
 - **Reaction System**: Verified, helpful, disputed classifications
 - **Member Profiles**: Trust scores, contribution history, specializations
 - **Follow System**: Connect with verified experts and contributors
+- **Engagement Insights**: Trending velocity scores, conversation health metrics, and hashtag heatmaps via `/social/insights`
 
 ### 🔍 **Powerful Search**
 - **Full-Text Search**: Across all sites and content
@@ -136,6 +140,18 @@
 
 ---
 
+## 🧠 Dual-Layer Fact Checking
+
+Truth Net now provides a self-auditing fact-checking pipeline surfaced through `/v1/fact-check/runs`:
+
+1. **Primary analysis** produces a verdict, confidence score, and evidence trace for each claim.
+2. **Auditor analysis** replays the evidence, challenges the primary verdict, and measures agreement.
+
+Runs are persisted in `fact_check_run` so curators can review the machine trace, adjust the verdict, and feed corrections back into
+the knowledge base.
+
+---
+
 ## 🛠️ Quick Start
 
 ### 📋 **Prerequisites**
@@ -174,6 +190,17 @@ cd ../client
 npm install
 npm run tauri dev
 ```
+
+### 🧪 Run the Test Suite
+
+Focused regression tests cover the new site builder, social insights, and dual-check fact verification flows.
+
+```bash
+cd server
+python -m pytest
+```
+
+> Tests create a disposable SQLite database and configure a strong JWT secret automatically—no manual prep required.
 
 **🎉 Access your Truth Net:**
 - **Server API**: http://localhost:8000

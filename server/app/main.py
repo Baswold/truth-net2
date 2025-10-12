@@ -2,7 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .routes import auth_router, sites_router, social_router, search_router, moderation_router
+from .routes import (
+    auth_router,
+    sites_router,
+    social_router,
+    search_router,
+    moderation_router,
+    fact_check_router,
+)
 
 
 def create_app() -> FastAPI:
@@ -22,6 +29,7 @@ def create_app() -> FastAPI:
     app.include_router(social_router, prefix=settings.api_v1_prefix)
     app.include_router(search_router, prefix=settings.api_v1_prefix)
     app.include_router(moderation_router, prefix=settings.api_v1_prefix)
+    app.include_router(fact_check_router, prefix=settings.api_v1_prefix)
 
     @app.get("/")
     def read_root():
