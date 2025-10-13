@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampMixin
@@ -19,6 +19,10 @@ class SiteStatus(str, Enum):  # type: ignore[type-arg]
 
 class Site(Base, TimestampMixin):
     __tablename__ = "site"
+    __table_args__ = (
+        Index("ix_site_status", "status"),
+        Index("ix_site_owner_id", "owner_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     slug: Mapped[str] = mapped_column(String(120), unique=True, index=True)

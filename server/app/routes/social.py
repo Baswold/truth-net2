@@ -1,17 +1,19 @@
 from datetime import datetime
-from typing import List
+from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session, selectinload
 
+from ..auth import get_current_active_user
 from ..database import get_session
-from ..models import TruthPost, TruthThread
+from ..models import Member, TruthPost, TruthThread
 from ..services.social import (
     aggregate_hashtags,
     build_post_insights,
     build_thread_health,
 )
+from ..services.feed_filter import feed_filter_service
 
 router = APIRouter(prefix="/social", tags=["social"])
 
@@ -24,6 +26,8 @@ def _velocity_score(post: TruthPost) -> float:
 
 
 class PostResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     author_id: int
     title: str | None
@@ -35,11 +39,10 @@ class PostResponse(BaseModel):
     created_at: str
     velocity_score: float
 
-    class Config:
-        from_attributes = True
-
 
 class ThreadResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     post_id: int | None
     creator_id: int
@@ -47,9 +50,6 @@ class ThreadResponse(BaseModel):
     topic: str | None
     locked: bool
     trust_score: int
-
-    class Config:
-        from_attributes = True
 
 
 class PostInsightResponse(BaseModel):
@@ -79,12 +79,17 @@ class SocialInsightsResponse(BaseModel):
 
 
 @router.get("/posts", response_model=List[PostResponse])
-def list_posts(limit: int = 20, db: Session = Depends(get_session)):
-    """Get recent published posts."""
+def list_posts(
+    limit: int = Query(20, le=100, description="Number of posts to return"),
+    offset: int = Query(0, ge=0, description="Number of posts to skip"),
+    db: Session = Depends(get_session)
+):
+    """Get recent published posts with pagination."""
     posts = (
         db.query(TruthPost)
-        .filter(TruthPost.published == True)
+        .filter(TruthPost.published.is_(True))
         .order_by(TruthPost.created_at.desc())
+        .offset(offset)
         .limit(limit)
         .all()
     )
@@ -107,15 +112,59 @@ def list_posts(limit: int = 20, db: Session = Depends(get_session)):
 
 
 @router.get("/threads", response_model=List[ThreadResponse])
-def list_threads(limit: int = 20, db: Session = Depends(get_session)):
-    """Get recent discussion threads."""
+def list_threads(
+    limit: int = Query(20, le=100, description="Number of threads to return"),
+    offset: int = Query(0, ge=0, description="Number of threads to skip"),
+    db: Session = Depends(get_session)
+):
+    """Get recent discussion threads with pagination."""
     threads = (
         db.query(TruthThread)
         .order_by(TruthThread.created_at.desc())
+        .offset(offset)
         .limit(limit)
         .all()
     )
     return threads
+
+
+@router.get("/feed/personalized", response_model=List[PostResponse])
+def get_personalized_feed(
+    limit: int = Query(20, le=100, description="Number of posts to return"),
+    offset: int = Query(0, ge=0, description="Number of posts to skip"),
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+    db: Session = Depends(get_session)
+):
+    """
+    Get personalized feed based on user's preferences.
+    
+    Returns posts filtered and ranked according to your feed preferences.
+    If no preferences are set, returns the default feed (all published posts).
+    
+    To set preferences, use POST /v1/feed-preferences/me
+    """
+    posts = feed_filter_service.get_personalized_feed(
+        member_id=current_user.id,
+        db=db,
+        limit=limit,
+        offset=offset
+    )
+    
+    return [
+        PostResponse(
+            id=p.id,
+            author_id=p.author_id,
+            title=p.title,
+            content=p.content,
+            tags=p.tags,
+            citations=p.citations,
+            published=p.published,
+            trust_score=p.trust_score,
+            created_at=p.created_at.isoformat(),
+            velocity_score=_velocity_score(p),
+        )
+        for p in posts
+    ]
 
 
 @router.get("/posts/{post_id}", response_model=PostResponse)
@@ -146,7 +195,7 @@ def get_social_insights(limit: int = 20, db: Session = Depends(get_session)):
 
     posts = (
         db.query(TruthPost)
-        .filter(TruthPost.published == True)
+        .filter(TruthPost.published.is_(True))
         .order_by(TruthPost.created_at.desc())
         .limit(limit)
         .all()

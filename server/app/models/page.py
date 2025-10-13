@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampMixin
@@ -19,6 +19,11 @@ class PageStatus(str, Enum):  # type: ignore[type-arg]
 
 class Page(Base, TimestampMixin):
     __tablename__ = "page"
+    __table_args__ = (
+        UniqueConstraint("site_id", "path", name="uq_page_site_path"),
+        Index("ix_page_status", "status"),
+        Index("ix_page_site_id", "site_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     site_id: Mapped[int] = mapped_column(ForeignKey("site.id", ondelete="CASCADE"))
@@ -29,7 +34,9 @@ class Page(Base, TimestampMixin):
     layout_json: Mapped[dict] = mapped_column(JSON, default=dict)
     page_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     
-    live_version_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    live_version_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("content_version.id", ondelete="SET NULL"), nullable=True
+    )
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     site = relationship("Site", back_populates="pages")

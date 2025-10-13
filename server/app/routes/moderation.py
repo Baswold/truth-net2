@@ -1,16 +1,19 @@
-from typing import List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
+from ..auth import require_role
 from ..database import get_session
-from ..models import Submission, ReviewAction
+from ..models import Member, Submission, ReviewAction
 
 router = APIRouter(prefix="/moderation", tags=["moderation"])
 
 
 class SubmissionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     submission_type: str
     submitted_by: int
@@ -19,11 +22,10 @@ class SubmissionResponse(BaseModel):
     priority: int
     created_at: str
 
-    class Config:
-        from_attributes = True
-
 
 class ReviewResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     submission_id: int
     reviewer_id: int
@@ -31,17 +33,15 @@ class ReviewResponse(BaseModel):
     rationale: str | None
     reviewed_at: str
 
-    class Config:
-        from_attributes = True
-
 
 @router.get("/submissions", response_model=List[SubmissionResponse])
 def list_submissions(
     state: str | None = None,
     limit: int = 50,
+    current_user: Annotated[Member, Depends(require_role("curator", "admin"))],
     db: Session = Depends(get_session)
 ):
-    """Get pending submissions for review."""
+    """Get pending submissions for review. Requires curator or admin role."""
     query = db.query(Submission)
     
     if state:
@@ -66,8 +66,12 @@ def list_submissions(
 
 
 @router.get("/submissions/{submission_id}/reviews", response_model=List[ReviewResponse])
-def get_submission_reviews(submission_id: int, db: Session = Depends(get_session)):
-    """Get reviews for a submission."""
+def get_submission_reviews(
+    submission_id: int,
+    current_user: Annotated[Member, Depends(require_role("curator", "admin"))],
+    db: Session = Depends(get_session)
+):
+    """Get reviews for a submission. Requires curator or admin role."""
     reviews = db.query(ReviewAction).filter(ReviewAction.submission_id == submission_id).all()
     
     return [

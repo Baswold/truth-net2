@@ -66,13 +66,17 @@ def load_demo_content():
 
                 # Create pages
                 for page_data in pages_data:
+                    from datetime import datetime
+                    published_at = datetime.utcnow()
+                    
                     page = Page(
                         site_id=site.id,
                         path=page_data["path"],
                         title=page_data["title"],
                         layout_json=page_data.get("layout", {}),
-                        metadata=page_data.get("metadata", {}),
+                        page_metadata=page_data.get("metadata", {}),
                         status="published",
+                        published_at=published_at,
                     )
                     session.add(page)
                     session.flush()
@@ -83,9 +87,10 @@ def load_demo_content():
                         version_number=1,
                         layout_json=page_data.get("layout", {}),
                         editor_id=admin.id,
-                        published_at=page.published_at,
+                        published_at=published_at,
                     )
                     session.add(version)
+                    session.flush()
 
                     page.live_version_id = version.id
                     session.commit()

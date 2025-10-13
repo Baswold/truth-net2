@@ -1,12 +1,15 @@
 """API endpoints for the dual-layer fact checker."""
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from ..auth import get_current_active_user
 from ..database import get_session
-from ..models import FactCheckRun
+from ..models import FactCheckRun, Member
 from ..services.fact_check import DualLayerFactChecker
 
 router = APIRouter(prefix="/fact-check", tags=["fact-check"])
@@ -40,8 +43,12 @@ _fact_checker = DualLayerFactChecker()
 
 
 @router.post("/runs", response_model=FactCheckResponse)
-def run_fact_check(request: FactCheckRequest, db: Session = Depends(get_session)):
-    """Execute a dual-layer fact check and persist the run."""
+def run_fact_check(
+    request: FactCheckRequest,
+    current_user: Annotated[Member, Depends(get_current_active_user)],
+    db: Session = Depends(get_session)
+):
+    """Execute a dual-layer fact check and persist the run. Requires authentication."""
 
     if not request.evidence_snippets:
         raise HTTPException(status_code=400, detail="At least one evidence snippet is required")
