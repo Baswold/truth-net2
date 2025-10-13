@@ -1,7 +1,7 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from ..database import get_session
@@ -12,6 +12,8 @@ router = APIRouter(prefix="/sites", tags=["sites"])
 
 
 class SiteResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     slug: str
     title: str
@@ -20,11 +22,10 @@ class SiteResponse(BaseModel):
     tags: dict
     status: str
 
-    class Config:
-        from_attributes = True
-
 
 class PageResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    
     id: int
     site_id: int
     path: str
@@ -32,10 +33,6 @@ class PageResponse(BaseModel):
     status: str
     layout_json: dict
     metadata: dict = Field(alias="page_metadata")
-
-    class Config:
-        from_attributes = True
-        populate_by_name = True
 
 
 class BlueprintResponse(BaseModel):
@@ -67,9 +64,21 @@ class PagePreviewResponse(BaseModel):
 
 
 @router.get("/", response_model=List[SiteResponse])
-def list_sites(db: Session = Depends(get_session)):
-    """Get all published sites."""
-    sites = db.query(Site).filter(Site.status == "published").all()
+def list_sites(
+    limit: int = Query(20, le=100, description="Number of sites to return"),
+    offset: int = Query(0, ge=0, description="Number of sites to skip"),
+    status: str | None = Query(None, description="Filter by status"),
+    db: Session = Depends(get_session)
+):
+    """Get published sites with pagination."""
+    query = db.query(Site)
+    
+    if status:
+        query = query.filter(Site.status == status)
+    else:
+        query = query.filter(Site.status == "published")
+    
+    sites = query.order_by(Site.created_at.desc()).offset(offset).limit(limit).all()
     return sites
 
 
@@ -90,13 +99,24 @@ def get_site(slug: str, db: Session = Depends(get_session)):
 
 
 @router.get("/{slug}/pages", response_model=List[PageResponse])
-def get_site_pages(slug: str, db: Session = Depends(get_session)):
-    """Get all pages for a site."""
+def get_site_pages(
+    slug: str,
+    limit: int = Query(50, le=200, description="Number of pages to return"),
+    offset: int = Query(0, ge=0, description="Number of pages to skip"),
+    status: str | None = Query(None, description="Filter by status"),
+    db: Session = Depends(get_session)
+):
+    """Get pages for a site with pagination."""
     site = db.query(Site).filter(Site.slug == slug).first()
     if not site:
         raise HTTPException(status_code=404, detail="Site not found")
     
-    pages = db.query(Page).filter(Page.site_id == site.id).all()
+    query = db.query(Page).filter(Page.site_id == site.id)
+    
+    if status:
+        query = query.filter(Page.status == status)
+    
+    pages = query.order_by(Page.created_at.desc()).offset(offset).limit(limit).all()
     return pages
 
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampMixin
@@ -12,6 +12,10 @@ from .base import Base, TimestampMixin
 
 class TruthPost(Base, TimestampMixin):
     __tablename__ = "truth_post"
+    __table_args__ = (
+        Index("ix_truth_post_published", "published"),
+        Index("ix_truth_post_author_id", "author_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("member.id", ondelete="CASCADE"))
@@ -23,7 +27,7 @@ class TruthPost(Base, TimestampMixin):
     citations: Mapped[dict] = mapped_column(JSON, default=dict)
     extra_metadata: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
     
-    published: Mapped[bool] = mapped_column(default=False)
+    published: Mapped[bool] = mapped_column(Boolean, default=False)
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     trust_score: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -70,6 +74,12 @@ class ThreadComment(Base, TimestampMixin):
 
 class Reaction(Base, TimestampMixin):
     __tablename__ = "reaction"
+    __table_args__ = (
+        UniqueConstraint("member_id", "post_id", "reaction_type", name="uq_reaction_member_post_type"),
+        UniqueConstraint("member_id", "comment_id", "reaction_type", name="uq_reaction_member_comment_type"),
+        Index("ix_reaction_post_id", "post_id"),
+        Index("ix_reaction_comment_id", "comment_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     member_id: Mapped[int] = mapped_column(ForeignKey("member.id", ondelete="CASCADE"))
@@ -87,6 +97,11 @@ class Reaction(Base, TimestampMixin):
 
 class Follow(Base, TimestampMixin):
     __tablename__ = "follow"
+    __table_args__ = (
+        UniqueConstraint("follower_id", "following_id", name="uq_follow_follower_following"),
+        Index("ix_follow_follower_id", "follower_id"),
+        Index("ix_follow_following_id", "following_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     follower_id: Mapped[int] = mapped_column(ForeignKey("member.id", ondelete="CASCADE"))
@@ -98,6 +113,10 @@ class Follow(Base, TimestampMixin):
 
 class CommunityVerdict(Base, TimestampMixin):
     __tablename__ = "community_verdict"
+    __table_args__ = (
+        UniqueConstraint("target_type", "target_id", name="uq_community_verdict_target"),
+        Index("ix_community_verdict_target", "target_type", "target_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     target_type: Mapped[str] = mapped_column(String(32))  # post, comment, page
@@ -105,5 +124,5 @@ class CommunityVerdict(Base, TimestampMixin):
     
     verdict: Mapped[str] = mapped_column(String(64))  # verified, disputed, misleading
     vote_count: Mapped[int] = mapped_column(Integer, default=0)
-    curator_approved: Mapped[bool] = mapped_column(default=False)
+    curator_approved: Mapped[bool] = mapped_column(Boolean, default=False)
     evidence: Mapped[dict] = mapped_column(JSON, default=dict)

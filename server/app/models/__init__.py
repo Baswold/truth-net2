@@ -5,6 +5,7 @@ from .page import Page, PageStatus, ContentVersion, TruthAssertion
 from .social import TruthPost, TruthThread, ThreadComment, Reaction, Follow, CommunityVerdict
 from .fact_check import FactCheckRun, ImportSource, SiteMembership, FeatureToggle
 from .moderation import Submission, ReviewAction, PenaltyLedger, AuditLog
+from .feed_preference import FeedPreference
 
 __all__ = [
     "Base",
@@ -31,4 +32,5 @@ __all__ = [
     "ReviewAction",
     "PenaltyLedger",
     "AuditLog",
+    "FeedPreference",
 ]

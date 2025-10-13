@@ -43,5 +43,6 @@ class Member(Base):
     sites = relationship("Site", back_populates="owner")
     posts = relationship("TruthPost", back_populates="author")
     threads = relationship("TruthThread", back_populates="creator")
+    feed_preference = relationship("FeedPreference", back_populates="member", uselist=False)
 
     __mapper_args__ = {"eager_defaults": True}
