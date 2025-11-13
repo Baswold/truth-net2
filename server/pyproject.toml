@@ -16,7 +16,7 @@ uvicorn = {version = "^0.30.5", extras = ["standard"]}
 
 # Database
 sqlalchemy = "^2.0.31"
-'psycopg[binary]' = "^3.2.1"
+psycopg2-binary = "^2.9.9"
 alembic = "^1.13.2"
 sqlalchemy-utils = "^0.41.2"
 
@@ -30,7 +30,7 @@ itsdangerous = "^2.2.0"  # Reserved: password reset, email verification
 redis = "^5.0.7"
 
 # Search
-meilisearch = "^0.30.1"
+meilisearch = "^0.31.0"
 
 # Background Jobs (reserved for ingestion/scheduled tasks)
 celery = "^5.4.0"

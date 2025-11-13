@@ -36,10 +36,10 @@ class ReviewResponse(BaseModel):
 
 @router.get("/submissions", response_model=List[SubmissionResponse])
 def list_submissions(
-    state: str | None = None,
-    limit: int = 50,
     current_user: Annotated[Member, Depends(require_role("curator", "admin"))],
-    db: Session = Depends(get_session)
+    db: Session = Depends(get_session),
+    state: str | None = None,
+    limit: int = 50
 ):
     """Get pending submissions for review. Requires curator or admin role."""
     query = db.query(Submission)

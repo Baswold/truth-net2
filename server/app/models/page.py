@@ -40,7 +40,17 @@ class Page(Base, TimestampMixin):
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     site = relationship("Site", back_populates="pages")
-    versions = relationship("ContentVersion", back_populates="page", cascade="all, delete-orphan")
+    versions = relationship(
+        "ContentVersion",
+        back_populates="page",
+        foreign_keys="[ContentVersion.page_id]",
+        cascade="all, delete-orphan"
+    )
+    live_version = relationship(
+        "ContentVersion",
+        foreign_keys=[live_version_id],
+        post_update=True
+    )
     assertions = relationship("TruthAssertion", back_populates="page", cascade="all, delete-orphan")
 
 
@@ -56,7 +66,7 @@ class ContentVersion(Base, TimestampMixin):
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     change_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    page = relationship("Page", back_populates="versions")
+    page = relationship("Page", back_populates="versions", foreign_keys=[page_id])
     editor = relationship("Member")
 
 

@@ -9,7 +9,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+# Set environment variables before importing app modules
 os.environ.setdefault("TRUTHNET_JWT_SECRET", "test-secret-key-that-is-long-enough-1234567890")
+os.environ.setdefault("TRUTHNET_DATABASE_URL", "sqlite:///test.db")
 
 from app.database import Base, get_session
 from app.main import create_app

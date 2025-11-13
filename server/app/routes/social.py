@@ -130,10 +130,10 @@ def list_threads(
 
 @router.get("/feed/personalized", response_model=List[PostResponse])
 def get_personalized_feed(
-    limit: int = Query(20, le=100, description="Number of posts to return"),
-    offset: int = Query(0, ge=0, description="Number of posts to skip"),
     current_user: Annotated[Member, Depends(get_current_active_user)],
-    db: Session = Depends(get_session)
+    db: Session = Depends(get_session),
+    limit: int = Query(20, le=100, description="Number of posts to return"),
+    offset: int = Query(0, ge=0, description="Number of posts to skip")
 ):
     """
     Get personalized feed based on user's preferences.

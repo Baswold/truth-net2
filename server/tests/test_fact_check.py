@@ -16,10 +16,24 @@ def test_dual_layer_fact_checker_agreement():
 
 
 def test_fact_check_route_persists_run(client, session):
+    from app.auth import create_access_token, hash_password
+    from app.models import Member
+
+    # Create a user for authentication
+    member = Member(
+        email="user@example.com",
+        username="testuser",
+        display_name="Test User",
+        password_hash=hash_password("password"),
+    )
+    session.add(member)
+    session.flush()
+
     site = Site(
         slug="analysis-hub",
         title="Analysis Hub",
         status=SiteStatus.PUBLISHED.value,
+        owner_id=member.id,
     )
     page = Page(
         site=site,
@@ -32,6 +46,9 @@ def test_fact_check_route_persists_run(client, session):
     session.add(page)
     session.commit()
 
+    # Create token for authentication
+    token = create_access_token(data={"sub": str(member.id), "username": member.username})
+
     request_payload = {
         "target_type": "page",
         "target_id": page.id,
@@ -39,7 +56,11 @@ def test_fact_check_route_persists_run(client, session):
         "evidence_snippets": ["Official data shows the finding was confirmed."],
         "context": "Research summary",
     }
-    response = client.post("/v1/fact-check/runs", json=request_payload)
+    response = client.post(
+        "/v1/fact-check/runs",
+        json=request_payload,
+        headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["run_id"] > 0
